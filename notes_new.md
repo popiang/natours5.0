@@ -1,0 +1,58 @@
+1. create package.json files
+	- npm init
+2. npm install
+	- express
+	- body-parser
+	- morgan
+	- dotenv
+	- mongoose
+	- slugify
+3. create
+	- app.js
+	- server.js
+	- config.env
+	- folder: routes
+		- tourRoutes.js
+		- userRoutes.js
+	- folder: controller
+		- tourController.js
+		- userController.js
+		- errorController.js
+	- folder: models
+		- tourModel.js
+	- folder: utils
+4. start server
+	- app.js create app
+	- server.js require the app and start the server
+5. app.js
+	- require body-parser and use it
+	- require morgan and display on development environment
+	- set static files
+6. create db in mongo db atlas
+7. in tourModel.js create 
+	- tourSchema with all the validations
+8. in tourController create
+	- getAllTours
+	- getTourById
+	- createTour
+	- updateTour
+	- deleteTour
+9. in tourRoutes create routes for all above controller and then add as middleware in app.js
+10. import dev data into db
+11. add db connection in server.js
+12. test semuanya kat postman
+13. if semua ok, then add query, limit fields, sort & paginate features into tourController and move the features to apiFeatures.js
+14. if semua ok, then dalam tourModel
+	- create virtual properties
+	- add document middleware
+	- add query middleware
+	- add aggregation middleware
+15. create getTourStats & getMonthlyPlan using Tour.aggregate
+16. handle errors
+	- create catchAsync
+	- create appError
+	- handle the rest of the error
+
+
+
+	
