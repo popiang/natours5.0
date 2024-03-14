@@ -41,14 +41,16 @@
 10. import dev data into db
 11. add db connection in server.js
 12. test semuanya kat postman
-13. if semua ok, then add query, limit fields, sort & paginate features into tourController and move the features to apiFeatures.js
-14. if semua ok, then dalam tourModel
+13. if semua ok, then add query, limit fields, sort & paginate features into tourController
+14. add tour alias
+15. move the above query features into apiFeatures.js
+16. create getTourStats & getMonthlyPlan using Tour.aggregate
+17. if semua ok, then dalam tourModel
 	- create virtual properties
 	- add document middleware
 	- add query middleware
 	- add aggregation middleware
-15. create getTourStats & getMonthlyPlan using Tour.aggregate
-16. handle errors
+18. handle errors
 	- create catchAsync
 	- create appError
 	- handle the rest of the error

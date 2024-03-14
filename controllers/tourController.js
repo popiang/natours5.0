@@ -1,8 +1,52 @@
 const Tour = require('../models/tourModel');
 
+exports.topTours = (req, res, next) => {
+    req.query.limit = 5;
+    req.query.sort = '-ratingsAverage,price';
+    req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
+
+    next();
+};
+
 exports.getAllTours = async (req, res) => {
     try {
-        const tours = await Tour.find();
+		// filter
+        const queryObj = { ...req.query };
+        const excludedFields = ['page', 'limit', 'sort', 'fields'];
+        excludedFields.forEach((field) => delete queryObj[field]);
+
+		// advance filter
+        let queryStr = JSON.stringify(queryObj);
+        queryStr = queryStr.replace(
+            /\b(gt|gte|lt|lte)\b/g,
+            (match) => `$${match}`
+        );
+
+        let query = Tour.find(JSON.parse(queryStr));
+
+		// sort
+		if (req.query.sort) {
+			const sortBy = req.query.sort.split(",").join(" ");
+			query = query.sort(sortBy);
+		} else {
+			query = query.sort('-createdBy');
+		}
+
+		// limit fields
+		if (req.query.fields) {
+			const limitFields = req.query.fields.split(",").join(" ");
+			query = query.select(limitFields);
+		} else {
+			query = query.select("-__v");
+		}
+
+		// pagination
+		const page = req.query.page * 1 || 1;
+		const limit = req.query.limit * 1 || 100;
+		const skip = (page - 1) * limit;
+		query = query.skip(skip).limit(limit);
+
+        const tours = await query;
 
         res.status(200).json({
             status: 'Success',
@@ -93,3 +137,5 @@ exports.deleteATour = async (req, res) => {
         });
     }
 };
+
+
