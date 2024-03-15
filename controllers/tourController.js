@@ -1,4 +1,5 @@
 const Tour = require('../models/tourModel');
+const APIFeatures = require('../utils/apiFeatures');
 
 exports.topTours = (req, res, next) => {
     req.query.limit = 5;
@@ -10,43 +11,13 @@ exports.topTours = (req, res, next) => {
 
 exports.getAllTours = async (req, res) => {
     try {
-		// filter
-        const queryObj = { ...req.query };
-        const excludedFields = ['page', 'limit', 'sort', 'fields'];
-        excludedFields.forEach((field) => delete queryObj[field]);
+        const apiFeatures = new APIFeatures(Tour.find(), req.query)
+            .filter()
+            .sort()
+            .limitFields()
+            .paginate();
 
-		// advance filter
-        let queryStr = JSON.stringify(queryObj);
-        queryStr = queryStr.replace(
-            /\b(gt|gte|lt|lte)\b/g,
-            (match) => `$${match}`
-        );
-
-        let query = Tour.find(JSON.parse(queryStr));
-
-		// sort
-		if (req.query.sort) {
-			const sortBy = req.query.sort.split(",").join(" ");
-			query = query.sort(sortBy);
-		} else {
-			query = query.sort('-createdBy');
-		}
-
-		// limit fields
-		if (req.query.fields) {
-			const limitFields = req.query.fields.split(",").join(" ");
-			query = query.select(limitFields);
-		} else {
-			query = query.select("-__v");
-		}
-
-		// pagination
-		const page = req.query.page * 1 || 1;
-		const limit = req.query.limit * 1 || 100;
-		const skip = (page - 1) * limit;
-		query = query.skip(skip).limit(limit);
-
-        const tours = await query;
+        const tours = await apiFeatures.query;
 
         res.status(200).json({
             status: 'Success',
@@ -138,4 +109,37 @@ exports.deleteATour = async (req, res) => {
     }
 };
 
+exports.getTourStats = async (req, res) => {
+    try {
+        const stats = await Tour.aggregate([
+            {
+                $match: { ratingsAverage: { $gte: 4.5 } },
+            },
+            {
+                $group: {
+                    _id: { $toUpper: '$difficulty' },
+                    numTours: { $sum: 1 },
+                    numRatings: { $sum: '$ratingsQuantity' },
+                    avgRating: { $avg: '$ratingsAverage' },
+                    minPrice: { $min: '$price' },
+                    maxPrice: { $max: '$price' },
+                },
+            },
+            {
+                $sort: { avgPrice: 1 },
+            },
+        ]);
 
+        res.status(200).json({
+            status: 'Success',
+            data: {
+                stats,
+            },
+        });
+    } catch (error) {
+        res.status(404).json({
+            status: 'Fail',
+            message: error,
+        });
+    }
+};
