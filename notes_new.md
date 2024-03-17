@@ -51,9 +51,17 @@
 	- add query middleware
 	- add aggregation middleware
 18. handle errors
+	- unhandle routes
+	- create global error handling middleware
+	- create AppError class
 	- create catchAsync
-	- create appError
-	- handle the rest of the error
+	- create 404 not found error when tour id is not found
+	- create development vs production error message
+	- handle invalid database ID
+	- handle duplicate database fields
+	- handle mongoose validation error
+	- handle error outside express - unhandled rejections
+	- catch uncaught exceptions
 
 
 
