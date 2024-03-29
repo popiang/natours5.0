@@ -47,6 +47,10 @@ const userSchema = mongoose.Schema({
     },
     passwordResetToken: String,
     passwordResetExpires: Date,
+    active: {
+        type: Boolean,
+        default: true,
+    },
 });
 
 userSchema.pre('save', async function (next) {
@@ -63,13 +67,13 @@ userSchema.pre('save', async function (next) {
     next();
 });
 
-userSchema.pre('save', function(next) {
-	if (!this.isModified('password') || this.isNew) {
-		return next();
-	}
+userSchema.pre('save', function (next) {
+    if (!this.isModified('password') || this.isNew) {
+        return next();
+    }
 
-	this.passwordChangeAt = Date.now() - 1000;
-	next();
+    this.passwordChangeAt = Date.now() - 1000;
+    next();
 });
 
 userSchema.methods.correctPassword = async function (
@@ -100,9 +104,9 @@ userSchema.methods.createPasswordResetToken = function () {
         .update(resetToken)
         .digest('hex');
 
-	this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+    this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
 
-	return resetToken;
+    return resetToken;
 };
 
 const User = mongoose.model('User', userSchema);
